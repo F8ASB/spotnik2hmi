@@ -40,14 +40,13 @@ echo "INSTALLATION scripts python"
 git clone https://github.com/F8ASB/spotnik2hmi.git /opt/spotnik/spotnik2hmi/
 
 chmod +x /opt/spotnik/spotnik2hmi/spotnik2hmi.py
-chmod +x /opt/spotnik/spotnik2hmi/python-metar/get_report.py
 
 echo "INSTALLATION COMPLETE !"
 
 echo "INSTALLATION UTILITAIRE METAR"
 git clone https://github.com/python-metar/python-metar.git /opt/spotnik/spotnik2hmi/python-metar/
 echo "INSTALLATION COMPLETE !"
-
+chmod +x /opt/spotnik/spotnik2hmi/python-metar/get_report.py
 PORT=$(whiptail --title "Choix du Port de communication" --radiolist \
 "Sur quoi raccorder vous le Nextion?" 15 60 4 \
 "ttyAMA0" "Sur Raspberry Pi " ON \
