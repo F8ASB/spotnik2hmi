@@ -1,6 +1,7 @@
 ![alt tag](http://blog.f8asb.com/wp-content/uploads/2018/12/spotnik2hmilogo.png)
 
 
+## VERSION LIGHT UNIQUEMENT POUR: 2.4K, 2.4T, 2.8K,2.8T,3.2K,3.2T,3.5T
 Software for Nextion and Spotnik Hamradio RRF Network
 
 ![alt tag](http://blog.f8asb.com/wp-content/uploads/2019/01/bootlight.jpg)
