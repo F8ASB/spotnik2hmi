@@ -32,13 +32,13 @@ portcom(sys.argv[1],sys.argv[2])
 eof = "\xff\xff\xff"
 today = datetime.now()
 url = ""
-url1 = "http://rrf.f5nlg.ovh/api/svxlink/RRF"
-url2 = "http://rrf.f5nlg.ovh/api/svxlink/FON"
-url3 = "http://rrf.f5nlg.ovh/api/svxlink/technique"
-url4 = "http://rrf.f5nlg.ovh/api/svxlink/international"
-url5 = "http://rrf.f5nlg.ovh/api/svxlink/bavardage"
-url6 = "http://rrf.f5nlg.ovh/api/svxlink/local"
-url7 = "http://rrf.f5nlg.ovh/api/svxlink/satellite"
+url1 = "http://rrf.f5nlg.ovh:82/api/svxlink/RRF"
+url2 = "http://rrf.f5nlg.ovh:82/api/svxlink/FON"
+url3 = "http://rrf.f5nlg.ovh:82/api/svxlink/technique"
+url4 = "http://rrf.f5nlg.ovh:82/api/svxlink/international"
+url5 = "http://rrf.f5nlg.ovh:82/api/svxlink/bavardage"
+url6 = "http://rrf.f5nlg.ovh:82/api/svxlink/local"
+url7 = "http://rrf.f5nlg.ovh:82/api/svxlink/experimental"
 url8 = "http://127.0.0.1"
 
 versionDash = "3.00L"
@@ -55,7 +55,7 @@ else:
     os.system('/etc/spotnik/restart')
     print "NETWORK CHANGE"
 
-if tn.find("sat") == -1:
+if tn.find("exp") == -1:
     print "NETWORK OK"
 else:
     os.system('echo "rrf" > /etc/spotnik/network')
@@ -159,10 +159,10 @@ print "Page trafic ..."
 page("trafic")
 
 while 1:
-#Gestion Date et heure (en FR)	
+#Gestion Date et heure (en FR)    
     dashlist = ""
     today = datetime.now()
-    locale.setlocale(locale.LC_TIME,'')	
+    locale.setlocale(locale.LC_TIME,'')    
     date = (today.strftime('%d-%m-%Y'))
     heure = (today.strftime('%H:%M'))
     heureS =(today.strftime('%H:%M:%S'))
@@ -171,26 +171,26 @@ while 1:
     ecrire("trafic.V_heure.txt",heure)
     requete("vis p9,0")
     ecrire("trafic.t15.txt",heure)
-    #Definition et affichage link actif	
+    #Definition et affichage link actif    
     a = open("/etc/spotnik/network","r")
     tn = a.read()
 
     if tn.find("rrf") == -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        ecrire("trafic.t0.txt","RESEAU RRF")
+        ecrire("trafic.t0.txt","SALON RRF")
         url = url1
-		
+        
     if tn.find("fon") == -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        ecrire("trafic.t0.txt","RESEAU FON")	
+        ecrire("trafic.t0.txt","SALON FON")    
         url = url2
-	
+    
     if tn.find("tec") == -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        ecrire("trafic.t0.txt","SALON TECHNIQUE")
+        ecrire("trafic.t0.txt","SALON TEC.")
         url = url3
 
     if tn.find("int") == -1:
@@ -202,7 +202,7 @@ while 1:
     if tn.find("bav") == -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        ecrire("trafic.t0.txt","SALON BAVARDAGE")
+        ecrire("trafic.t0.txt","SALON BAV.")
         url = url5
 
     if tn.find("loc") == -1:
@@ -211,17 +211,17 @@ while 1:
         ecrire("trafic.t0.txt","SALON LOCAL")
         url = url6
 
-    if tn.find("sat") == -1:
+    if tn.find("exp") == -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        ecrire("trafic.t0.txt","SALON SATELLITE")    
-	url = url7	
+        ecrire("trafic.t0.txt","SALON EXPER.")    
+    url = url7    
 
     if tn.find("reg") == -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        ecrire("trafic.t0.txt","SALON REGIONAL")    
-	url = url8	
+        ecrire("trafic.t0.txt","SALON REG.")    
+    url = url8    
 
     if tn.find("default") == -1:
         ecrire("page200.t3.txt","Mode autonome")
@@ -232,7 +232,7 @@ while 1:
 
 #
 #Gestion status TRX
-#	
+#    
 
 # Request HTTP datas
     try:
@@ -244,7 +244,7 @@ while 1:
     except requests.exceptions.Timeout as errt:
         print ('Timeout Error:', errt)
         ecrire("trafic.t1.txt","DASH HS")
-	
+    
 #controle si page Dashboard RRF ou TEC
     if tn.find("rrf") != -1:
         fincall= page_web.find ('"transmitter":"')
@@ -265,10 +265,10 @@ while 1:
             #setdim(rdim)
 
     if tn.find("tec") != -1:
-        fincall= page_web.find ('"transmitter":"')	
+        fincall= page_web.find ('"transmitter":"')    
         dashdebut= page_web.find ('"nodes":[')
         dashfin= page_web.find ('","TECHNIQUE"]')
-		
+        
         if fincall >0:
             tramecall= (page_web[(fincall):fincall+30])
             tramedash= (page_web[(dashdebut+10):(dashfin)])
@@ -356,7 +356,7 @@ while 1:
             #dimsend ='dim='+str(rdim)+eof
             #setdim(rdim)
     ecrire("trafic.t1.txt",TxStation)
-    if tn.find("sat") != -1:
+    if tn.find("exp") != -1:
         fincall= page_web.find ('"transmitter":"')
       
         if fincall >0:
@@ -378,7 +378,7 @@ while 1:
 
     if len(s)<59 and len(s)>0:
         print s
-#		print len(s)
+#        print len(s)
 
 #REBOOT
     if s.find("reboot")== -1:
@@ -448,7 +448,7 @@ while 1:
     else:
         print "Shutdown command...."
         page("confirm")
-        ecrire("confirm.t0.txt","CONFIRMER UN ARRET TOTAL ?")			
+        ecrire("confirm.t0.txt","CONFIRMER UN ARRET TOTAL ?")            
 #RESTART
     if s.find("restart")== -1:
         ecrire("page200.t3.txt","Mode autonome")
@@ -484,24 +484,24 @@ while 1:
                 wifistatut = 0
                 break
         page("confirm")
-        ecrire("confirm.t0.txt","CONFIRMER LA MAJ WIFI ?")		
-#INFO#	
+        ecrire("confirm.t0.txt","CONFIRMER LA MAJ WIFI ?")        
+#INFO#    
     if s.find("info")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
         print "Detection bouton info"
         #cput = '"'+cputemp+' C'+'"' 
-	#Freq = str(freq)+ ' Mhz'
+    #Freq = str(freq)+ ' Mhz'
         #ecrire("info.t14.txt",cputemp)
         #ecrire("info.t15.txt",Freq)
         #ecrire("info.t10.txt",version)
         #print "Frequence: "+freq
-	#print "Station: "+callsign
+    #print "Station: "+callsign
         #print "Spotnik: "+version
         #print "Script Version: "+versionDash
-	#print "Occupation disk: "+(occupdisk)
-	#print "IP: "+ip
-	#print "occupation systeme: "+str(chargecpu)
+    #print "Occupation disk: "+(occupdisk)
+    #print "IP: "+ip
+    #print "occupation systeme: "+str(chargecpu)
         #ecrire("info.t16.txt",versionDash)
         #ecrire("info.t13.txt",occupdisk)
         #ecrire("info.t0.txt",ip)
@@ -521,19 +521,19 @@ while 1:
         print "Node choisi"
         print s[s.find("nodeqsy")+7:s.find("nodeqsy")+13]+"#"
         dtmf(s[s.find("nodeqsy")+7:s.find("nodeqsy")+13]+"#")
-        page("echolink")							
-#TRAFIC#		
+        page("echolink")                            
+#TRAFIC#        
     if s.find("trafic")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
         print "Page trafic"
-		
+        
 #DASHBOARD#
     if s.find("dashboard")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
         print "Page dashboard"
-		
+        
 #MENU#
     if s.find("menu")== -1:
         ecrire("page200.t3.txt","Mode autonome")
@@ -554,7 +554,7 @@ while 1:
                 print "Envoi PASS actuel sur Nextion: "+wifi_pass
                 ecrire("wifi.t1.txt",str(wifi_ssid))
                 ecrire("wifi.t0.txt",str(wifi_pass))
-                wifistatut = 1	
+                wifistatut = 1    
 
 #ECHOLINK#
     if s.find("echolink")== -1:
@@ -566,14 +566,14 @@ while 1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
         print "Page clavier numerique"
-	
+    
 #Connect Echolink#
     if s.find("connexionecho")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
         print "Bouton connexion echolink"
-		
-		
+        
+        
 #Deconnect Echolink#
     if s.find("deconnectioncho")== -1:
         ecrire("page200.t3.txt","Mode autonome")
@@ -589,7 +589,7 @@ while 1:
         rxdim = s[9:-3]
         print rdim
         rdmi= rxdim
-		
+        
 #QSYSALONRRF#
     if s.find("qsyrrf")== -1:
         ecrire("page200.t3.txt","Mode autonome")
@@ -630,7 +630,7 @@ while 1:
     if s.find("qsysat")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "QSY SALON SAT"
+        print "QSY SALON EXP"
         dtmf("102#")
 
 #QSYSAT#
