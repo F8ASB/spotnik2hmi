@@ -22,17 +22,17 @@ if [ $INSTALL = "SPOTNIK2HMI" ]; then
 # MAJ
 echo "UPGRADE IN PROGRESS..."
 apt-get -y update
-#apt-get -y dist-upgrade
 apt-get -y upgrade
 echo "UPGRADE COMPLETED !"
  
 echo "INSTALLATION DEPENDANCE PYTHON"
-apt-get install gcc python-dev python-setuptools
-apt-get install python-pip
+apt-get install gcc python3-dev python3-setuptools
+apt-get install python3-pip
+apt-get install git-all
 pip install requests
 apt-get update
 apt-get upgrade
-apt-get install python-serial
+apt-get install python3-serial
 
 echo "INSTALLATION COMPLETE !"
 
