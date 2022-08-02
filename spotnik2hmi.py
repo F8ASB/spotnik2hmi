@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #Parametrage port serie
 
@@ -12,7 +12,7 @@ import time
 from time import time,sleep
 import requests
 #pour lecture fichier de config
-import ConfigParser, os
+import configparser, os
 #pour adresse ip
 import socket
 #pour CPU
@@ -49,18 +49,18 @@ a = open("/etc/spotnik/network","r")
 tn = a.read()
 
 if tn.find("default") == -1:
-    print "NETWORK OK"
+    print("NETWORK OK")
 else:
     os.system('echo "rrf" > /etc/spotnik/network')
     os.system('/etc/spotnik/restart')
-    print "NETWORK CHANGE"
+    print("NETWORK CHANGE")
 
 if tn.find("exp") == -1:
-    print "NETWORK OK"
+    print("NETWORK OK")
 else:
     os.system('echo "rrf" > /etc/spotnik/network')
     os.system('/etc/spotnik/restart')
-    print "NETWORK CHANGE"
+    print("NETWORK CHANGE")
         
 #Reglage de luminosite
 rdim = 10 #ecran sans reception signal
@@ -77,7 +77,7 @@ conf="/etc/NetworkManager/system-connections/SPOTNIK"
 svxlogfile = "/tmp/svxlink.log"   #SVXLink log file 
 
 #routine ouverture fichier de config
-config = ConfigParser.RawConfigParser()
+config = configparser.RawConfigParser()
 config.read(svxconfig)
 
 #recuperation indicatif et frequence    
@@ -118,15 +118,15 @@ if revision !="0000":
     f = open("/sys/class/thermal/thermal_zone0/temp", "r")
     t = f.readline ()
     cputemp = t[0:2]
-print board
+print(board)
 
 #Envoi des infos 
   
 logo(versionDash)
-print "Proc: "+(str(chargecpu))+"%   " + "CPU: "+cputemp+"°C" 
-print "Station: "+callsign
-print "Frequence: "+freq+" Mhz"
-print "Spotnik: Version:"+version
+print("Proc: "+(str(chargecpu))+"%   " + "CPU: "+cputemp+"°C") 
+print("Station: "+callsign)
+print("Frequence: "+freq+" Mhz")
+print("Spotnik: Version:"+version)
 
 #Reset ecran Nextion
 
@@ -135,27 +135,27 @@ resetHMI()
 sleep(5);
 
 #envoi information systeme
-print "Maj Call ..."
-print callsign
+print("Maj Call ...")
+print(callsign)
 ecrire("boot.va0.txt",str(callsign))
-print "Maj info disk ..."
-print occupdisk
+print("Maj info disk ...")
+print(occupdisk)
 ecrire("boot.vasd.txt",str(occupdisk))
-print "Maj info freq ..."
-print freq
+print("Maj info freq ...")
+print(freq)
 ecrire("boot.vafreq.txt",str(freq))
-print "Maj ip ..."
-print ip
+print("Maj ip ...")
+print(ip)
 ecrire("boot.vaip.txt",str(ip))
-print "Maj version ..."
-print version
+print("Maj version ...")
+print(version)
 ecrire("boot.vaverspotnik.txt",str(version))
-print "Maj version script..."
-print versionDash
+print("Maj version script...")
+print(versionDash)
 ecrire("boot.vascript.txt",str(versionDash))
 
 #Affichage de la page Dashboard
-print "Page trafic ..."
+print("Page trafic ...")
 page("trafic")
 
 while 1:
@@ -237,12 +237,12 @@ while 1:
 # Request HTTP datas
     try:
         r = requests.get(url, verify=False, timeout=10)
-        page_web = r.content
+        page_web = r.text
     except requests.exceptions.ConnectionError as errc:
-        print ('Error Connecting:', errc)
+        print(('Error Connecting:', errc))
         ecrire("trafic.t1.txt","DASH HS")
     except requests.exceptions.Timeout as errt:
-        print ('Timeout Error:', errt)
+        print(('Timeout Error:', errt))
         ecrire("trafic.t1.txt","DASH HS")
     
 #controle si page Dashboard RRF ou TEC
@@ -255,7 +255,7 @@ while 1:
             tramecall= (page_web[(fincall):fincall+30])
         #     tramedash= (page_web[(dashdebut):(dashfin)])
             call = tramecall.split('"')
-            print call[3]
+            print(call[3])
             #dashlist= tramedash.replace('"','')
             #print "dashlist:"+dashlist
             TxStation = call[3]
@@ -265,18 +265,18 @@ while 1:
             #setdim(rdim)
 
     if tn.find("tec") != -1:
-        fincall= page_web.find ('"transmitter":"')    
+        fincall= page_web.find ('"transmitter":"')  
         dashdebut= page_web.find ('"nodes":[')
-        dashfin= page_web.find ('","TECHNIQUE"]')
+        dashfin= page_web.find ('],"transmit":')
         
         if fincall >0:
             tramecall= (page_web[(fincall):fincall+30])
             tramedash= (page_web[(dashdebut+10):(dashfin)])
             call = tramecall.split('"')
-            print call[3]
+            print(call[3])
             dashfiltre= tramedash.replace('"','')
             dashlist=dashfiltre.replace(',TEC','')
-            print "dashlist:"+dashlist
+            print("dashlist:"+dashlist)
             TxStation = call[3]
             #setdim(txdim)
         else:
@@ -286,15 +286,15 @@ while 1:
     if tn.find("int") != -1:
         fincall= page_web.find ('"transmitter":"')  
         dashdebut= page_web.find ('"nodes":[')
-        dashfin= page_web.find (',"INTERNATIONAL"]')
+        dashfin= page_web.find ('],"transmit":')
         
         if fincall >0:
             tramecall= (page_web[(fincall):fincall+30])
             tramedash= (page_web[(dashdebut+10):(dashfin)])
             call = tramecall.split('"')
-            print call[3]
+            print(call[3])
             dashlist= tramedash.replace('"','')
-            print "dashlist:"+dashlist
+            print("dashlist:"+dashlist)
             TxStation = call[3]
             #setdim(txdim)
         else:
@@ -305,15 +305,15 @@ while 1:
     if tn.find("bav") != -1:
         fincall= page_web.find ('"transmitter":"')  
         dashdebut= page_web.find ('"nodes":[')
-        dashfin= page_web.find (',"BAVARDAGE"]')
+        dashfin= page_web.find ('],"transmit":')
         
         if fincall >0:
             tramecall= (page_web[(fincall):fincall+30])
             tramedash= (page_web[(dashdebut+10):(dashfin)])
             call = tramecall.split('"')
-            print call[3]
+            print(call[3])
             dashlist= tramedash.replace('"','')
-            print "dashlist:"+dashlist
+            print("dashlist:"+dashlist)
             TxStation = call[3]
             #setdim(txdim)
         else:
@@ -324,15 +324,15 @@ while 1:
     if tn.find("loc") != -1:
         fincall= page_web.find ('"transmitter":"')  
         dashdebut= page_web.find ('"nodes":[')
-        dashfin= page_web.find (',"LOCAL"]')
+        dashfin= page_web.find ('],"transmit":')
         
         if fincall >0:
             tramecall= (page_web[(fincall):fincall+30])
             tramedash= (page_web[(dashdebut+10):(dashfin)])
             call = tramecall.split('"')
-            print call[3]
+            print(call[3])
             dashlist= tramedash.replace('"','')
-            print "dashlist:"+dashlist
+            print("dashlist:"+dashlist)
             TxStation = call[3]
             #setdim(txdim)
         else:
@@ -347,7 +347,7 @@ while 1:
             tramecall= (page_web[(fincall):fincall+30])
          
             call = tramecall.split('"')
-            print call[3]
+            print(call[3])
           
             TxStation = call[3]
             #setdim(txdim)
@@ -363,7 +363,7 @@ while 1:
             tramecall= (page_web[(fincall):fincall+30])
          
             call = tramecall.split('"')
-            print call[3]
+            print(call[3])
           
             TxStation = call[3]
             #setdim(txdim)
@@ -377,14 +377,14 @@ while 1:
     s = hmiReadline()
 
     if len(s)<59 and len(s)>0:
-        print s
+        print(s)
 #        print len(s)
 
 #REBOOT
     if s.find("reboot")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "Reboot command...."
+        print("Reboot command....")
 
 #
 #GESTION DU OUI DE LA PAGE CONFIRM
@@ -395,7 +395,7 @@ while 1:
     if s.find("ouireboot")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "REBOOT"
+        print("REBOOT")
         page("boot")
         os.system('reboot')
 
@@ -403,7 +403,7 @@ while 1:
     if s.find("ouiredem")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "REDEMARRAGE"
+        print("REDEMARRAGE")
         dtmf("96#")
         page("trafic")
                 
@@ -411,7 +411,7 @@ while 1:
     if s.find("ouiarret")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "ARRET DU SYSTEM"
+        print("ARRET DU SYSTEM")
         page("arret")
         os.system('shutdown -h now')
 
@@ -426,7 +426,7 @@ while 1:
     if s.find("ouiquitecho")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "OUI QUITTE ECHOLINK"
+        print("OUI QUITTE ECHOLINK")
         dtmf("#")
         page("trafic")
         dtmf("96#")
@@ -435,7 +435,7 @@ while 1:
     if s.find("ouideconnectenode")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "DECONNECTE NODE"
+        print("DECONNECTE NODE")
         page("echolink")
         dtmf("#")
 #
@@ -446,14 +446,14 @@ while 1:
     if s.find("shutdown")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "Shutdown command...."
+        print("Shutdown command....")
         page("confirm")
         ecrire("confirm.t0.txt","CONFIRMER UN ARRET TOTAL ?")            
 #RESTART
     if s.find("restart")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "Restart command...."
+        print("Restart command....")
         page("confirm")
         ecrire("confirm.t0.txt","CONFIRMER LE REDEMARRAGE LOGICIEL ?")
 
@@ -461,7 +461,7 @@ while 1:
     if s.find("reboot")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "Reboot command...."
+        print("Reboot command....")
         page("confirm")
         ecrire("confirm.t0.txt","CONFIRMER LE REBOOT GENERAL ?")
 
@@ -469,7 +469,7 @@ while 1:
     if s.find("maj")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "MAJ Wifi...."
+        print("MAJ Wifi....")
         requete("get t0.txt")
         requete("get t1.txt")
 
@@ -479,8 +479,8 @@ while 1:
                 test= s.split("p")
                 newpass= test[1][:-3]
                 newssid= test[2][:-3]
-                print "New SSID: "+newssid
-                print "New PASS: "+newpass
+                print("New SSID: "+newssid)
+                print("New PASS: "+newpass)
                 wifistatut = 0
                 break
         page("confirm")
@@ -489,7 +489,7 @@ while 1:
     if s.find("info")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "Detection bouton info"
+        print("Detection bouton info")
         #cput = '"'+cputemp+' C'+'"' 
     #Freq = str(freq)+ ' Mhz'
         #ecrire("info.t14.txt",cputemp)
@@ -511,47 +511,47 @@ while 1:
     if s.find("meteo")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "Detection bouton meteo"
+        print("Detection bouton meteo")
         #METEO
         get_meteo()
 #NODE#
     if s.find("nodeqsy")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "Node choisi"
-        print s[s.find("nodeqsy")+7:s.find("nodeqsy")+13]+"#"
+        print("Node choisi")
+        print(s[s.find("nodeqsy")+7:s.find("nodeqsy")+13]+"#")
         dtmf(s[s.find("nodeqsy")+7:s.find("nodeqsy")+13]+"#")
         page("echolink")                            
 #TRAFIC#        
     if s.find("trafic")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "Page trafic"
+        print("Page trafic")
         
 #DASHBOARD#
     if s.find("dashboard")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "Page dashboard"
+        print("Page dashboard")
         
 #MENU#
     if s.find("menu")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "Page menu"
+        print("Page menu")
 #WIFI#
     if s.find("wifi")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "Page wifi"
+        print("Page wifi")
         Json="/etc/spotnik/config.json"
         if wifistatut == 0:
             with open(Json, 'r') as a:
                 infojson = json.load(a)
                 wifi_ssid = infojson['wifi_ssid']
                 wifi_pass = infojson['wpa_key']
-                print "Envoi SSID actuel sur Nextion: "+wifi_ssid
-                print "Envoi PASS actuel sur Nextion: "+wifi_pass
+                print("Envoi SSID actuel sur Nextion: "+wifi_ssid)
+                print("Envoi PASS actuel sur Nextion: "+wifi_pass)
                 ecrire("wifi.t1.txt",str(wifi_ssid))
                 ecrire("wifi.t0.txt",str(wifi_pass))
                 wifistatut = 1    
@@ -560,101 +560,101 @@ while 1:
     if s.find("echolink")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "Page echolink"
+        print("Page echolink")
 #Numkaypad#
     if s.find("keypadnum")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "Page clavier numerique"
+        print("Page clavier numerique")
     
 #Connect Echolink#
     if s.find("connexionecho")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "Bouton connexion echolink"
+        print("Bouton connexion echolink")
         
         
 #Deconnect Echolink#
     if s.find("deconnectioncho")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "Bouton deconnexion echolink"
+        print("Bouton deconnexion echolink")
                 
 
 #Reglage DIM#
     if s.find("regdim")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "Reglage DIM recu"
+        print("Reglage DIM recu")
         rxdim = s[9:-3]
-        print rdim
+        print(rdim)
         rdmi= rxdim
         
 #QSYSALONRRF#
     if s.find("qsyrrf")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "QSY SALON RRF"
+        print("QSY SALON RRF")
         dtmf("96#")
 #QSYFON#
     if s.find("qsyfon")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "QSY FON"
+        print("QSY FON")
         dtmf("97#")
 #QSYSALONTECH#
     if s.find("qsytech")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "QSY SALON TECH"
+        print("QSY SALON TECH")
         dtmf("98#")
 #QSYINTER#
     if s.find("qsyinter")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "QSY SALON INTER"
+        print("QSY SALON INTER")
         dtmf("99#")
 #QSYBAV#
     if s.find("qsyloc")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "QSY SALON LOCAL"
+        print("QSY SALON LOCAL")
         dtmf("101#")
 #QSYLOCAL#
     if s.find("qsybav")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "QSY SALON BAVARDAGE"
+        print("QSY SALON BAVARDAGE")
         dtmf("100#")
 #QSYSAT#
     if s.find("qsysat")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "QSY SALON EXP"
+        print("QSY SALON EXP")
         dtmf("102#")
 
 #QSYSAT#
     if s.find("qsyreg")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "QSY SALON REGIONAL"
+        print("QSY SALON REGIONAL")
         dtmf("104#")
 
 #DONNMETEO#
     if s.find("dmeteo")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "BULETIN METEO"
+        print("BULETIN METEO")
         dtmf("*51#")
 #PERROQUET
     if s.find("qsyperroquet")== -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "QSY PERROQUET"
+        print("QSY PERROQUET")
         dtmf("95#")
 #DASHBOARD#
     if s.find("listdash")== -1 and tn!="rrf" and tn!="fon":
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        print "ENVOI DASH"
+        print("ENVOI DASH")
         ecrire("trafic.g0.txt",dashlist)

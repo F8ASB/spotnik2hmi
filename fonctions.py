@@ -1,8 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ############################################################################
-# .-') _   ('-.  ) (`-.      .-') _                            .-') _      #		
+# .-') _   ('-.  ) (`-.      .-') _                            .-') _      #        
 #    ( OO ) )_(  OO)  ( OO ).   (  OO) )                          ( OO ) ) #
 #,--./ ,--,'(,------.(_/.  \_)-./     '._ ,-.-')  .-'),-----. ,--./ ,--,'  #
 #|   \ |  |\ |  .---' \  `.'  / |'--...__)|  |OO)( OO'  .-.  '|   \ |  |\  #
@@ -11,7 +11,7 @@
 #|  |\    |  |  .--'   .'    \_)   |  |  ,|  |_.'  \ |  | |  ||  |\    |   #
 #|  | \   |  |  `---. /  .'.  \    |  | (_|  |      `'  '-'  '|  | \   |   #
 #`--'  `--'  `------''--'   '--'   `--'   `--'        `-----' `--'  `--'   #
-#     			        	      TEAM: F0DEI,F5SWB,F8ASB	   #	
+#                                 TEAM: F0DEI,F5SWB,F8ASB      #    
 ############################################################################
 #import echolink
 import serial
@@ -29,11 +29,11 @@ from time import time,sleep
 import locale
 import mmap
 #partie dashboard
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import ssl
 url = "http://rrf.f5nlg.ovh"
 #pour lecture fichier de config
-import ConfigParser, os
+import configparser, os
 #pour adresse ip
 import socket
 #pour CPU
@@ -44,14 +44,14 @@ import json
 import csv
 
 #Variables:
-eof = "\xff\xff\xff"
+eof=bytes([0xFF,0xFF,0xFF])
 port= 0 
 #Chemin fichier Json
 Json="/etc/spotnik/config.json"
 icao="/opt/spotnik/spotnik2hmi/datas/icao.cfg"
 #routine ouverture fichier de config
 svxconfig="/etc/spotnik/svxlink.cfg"
-config = ConfigParser.RawConfigParser()
+config = configparser.RawConfigParser()
 config.read(svxconfig)
 
 
@@ -77,28 +77,29 @@ def getrevision():
     return myrevision 
 
 def portcom(portserie,vitesse):
-	global port
-	port=serial.Serial(port='/dev/'+portserie,baudrate=vitesse,timeout=1, writeTimeout=1)
-	print "Port serie: " +portserie+" Vitesse: "+vitesse
-	
-	
+    global port
+    port=serial.Serial(port='/dev/'+portserie,baudrate=vitesse,timeout=1, writeTimeout=1)
+    print("Port serie: " +portserie+" Vitesse: "+vitesse)
+    
+    
 def resetHMI():
-	global port
-	print "Reset HMI ..."
-	reset ='rest' +eof	
-	port.write(reset)
+
+    global port
+    print("Reset HMI ...")
+    rstcmd=b'rest' + eof
+    port.write(rstcmd)
+    sleep(1);
 
 #Fonction reglage dim du nextion
 def setdim(dimv):
 
-	dimsend ='dim='+str(dimv)+eof
-	port.write(dimsend)
+    dimsend ='dim='+str(dimv)+eof
+    port.write(dimsend)
 
 #Fonction requete du nextion
 def requete(valeur):
-
-        requetesend = str(valeur)+eof
-        port.write(requetesend)
+    requetesend = str.encode(valeur)+eof
+    port.write(requetesend)
 
 #Fonction suivre le log svxlink
 def follow(thefile):
@@ -111,18 +112,19 @@ def follow(thefile):
          yield line
 
 def hmiReadline():
-	global port
-	rcv = port.readline()
-        myString = str(rcv)
-        return myString
+    global port
+    rcv = port.readline()
+    myString = str(rcv)
+    return myString
+
 def getCPUuse():
 #    return(str(os.popen("sudo top -n1 | awk '/Cpu\(s\):/ {print $2}'").readline().strip(\
 #)))
-	CPU_Pct=str(round(float(os.popen('''grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage }' ''').readline()),2))
+   CPU_Pct=str(round(float(os.popen('''grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage }' ''').readline()),2))
 
     #print results
-	print("CPU Usage = " + CPU_Pct)
-	return(CPU_Pct)
+   print(("CPU Usage = " + CPU_Pct))
+   return(CPU_Pct)
 
 #Return information sur espace disque                     
 # Index 0: total disk space                                                         
@@ -136,64 +138,65 @@ def getDiskSpace():
         i = i +1
         line = p.readline()
         if i==2:
-	    	disk_space=(line.split()[4])
-                return(disk_space[:-1]+" %")	
+            disk_space=(line.split()[4])
+            return(disk_space[:-1]+" %")
 
 #Fonction de control d'extension au demarrage
 def usage():
     program = os.path.basename(sys.argv[0])
-    print ""	
-    print"             "'\x1b[7;37;41m'"****ATTENTION****"+'\x1b[0m'
-    print""	
-    print "Commande: python spotnik2hmi.py <port> <vitesse>"
-    print "Ex: python spotnik2hmi.py ttyAMA0 9600"
-    print ""
+    print("")   
+    print("             "'\x1b[7;37;41m'"****ATTENTION****"+'\x1b[0m')
+    print("")   
+    print("Commande: python spotnik2hmi.py <port> <vitesse>")
+    print("Ex: python spotnik2hmi.py ttyAMA0 9600")
+    print("")
     sys.exit(1)
 
-if len(sys.argv) > 2:
-    print "Ok"
-else:
-    usage()
+    if len(sys.argv) > 2:
+        print("Ok")
+    else:
+        usage()
 
 #Fonction envoyer un code DTMF au system
 def dtmf(code):
-	
-        b = open("/tmp/dtmf_uhf","a")
-        b.write(code)
-	print "code DTMF: "+code
-        b.close()
+    
+    b = open("/tmp/dtmf_uhf","a")
+    b.write(code)
+    print("code DTMF: "+code)
+    b.close()
 
 #Fonction envoyer le prenom selon le call
 def prenom(Searchcall):
-        callcut = Searchcall.split (" ")
-	Searchprenom = callcut[1]
-	print Searchprenom
-	lines = csv.reader(open("amat_annuaire.csv","rb"),delimiter=";")
+    
+    callcut = Searchcall.split (" ")
+    Searchprenom = callcut[1]
+    print(Searchprenom)
+    lines = csv.reader(open("amat_annuaire.csv","rb"),delimiter=";")
 
-	for indicatif,nom,prenom,adresse,ville,cp in lines:
-        	if indicatif==Searchprenom:
-                	print prenom                	
+    for indicatif,nom,prenom,adresse,ville,cp in lines:
+            if indicatif==Searchprenom:
+                    print(prenom)                   
 #recuperation Frequence dans JSON
 
 def get_frequency():
-	global frequence
-	#recherche code IMAO dans config.json
-        with open(Json, 'r') as c:
-                        afind= json.load(c)
-                        frequence=afind['rx_qrg']
-			
-	return(frequence +" Mhz")
-#recuperation indicatif dans Json		
+    global frequence
+    #recherche code IMAO dans config.json
+    with open(Json, 'r') as c:
+        afind= json.load(c)
+        frequence=afind['rx_qrg']
+            
+    return(frequence +" Mhz")
+#recuperation indicatif dans Json       
 def get_callsign():
-	global indicatif
+    global indicatif
         #recherche code IMAO dans config.json
-        with open(Json, 'r') as d:
-                        afind= json.load(d)
-                        call=afind['callsign']
-			dept = afind['Departement']
-			band = afind['band_type']			
-	indicatif = "("+dept+") "+call+" "+band
-	return(indicatif)        
+    with open(Json, 'r') as d:
+        afind= json.load(d)
+        call=afind['callsign']
+        dept = afind['Departement']
+        band = afind['band_type']           
+        indicatif = "("+dept+") "+call+" "+band
+    return(indicatif)        
 
 #Fonction envoyer des commande console
 def console(cmd):
@@ -203,58 +206,62 @@ def console(cmd):
 
 #Fonction Wifi ECRITURE
 def wifi(wifiid,wifipass):
-        cfg = ConfigParser.ConfigParser()
-        cfg.read(conf)
-        cfg.set('connection', 'id', wifiid)
-        cfg.set('wifi', 'ssid', wifiid)
-        cfg.set('wifi-security', 'psk', wifipass)
-        cfg.write(open(conf,'w'))
+    cfg = configparser.ConfigParser()
+    cfg.read(conf)
+    cfg.set('connection', 'id', wifiid)
+    cfg.set('wifi', 'ssid', wifiid)
+    cfg.set('wifi-security', 'psk', wifipass)
+    cfg.write(open(conf,'w'))
 
-        #lecture de donnees JSON
-        with open(Json, 'r') as f:
-                config = json.load(f)
-        #editer la donnee
-                config['wifi_ssid'] = wifiid
-                config['wpa_key'] = wifipass
-        #write it back to the file
-        with open(Json, 'w') as f:
-                json.dump(config, f)
+    #lecture de donnees JSON
+    with open(Json, 'r') as f:
+            config = json.load(f)
+    #editer la donnee
+            config['wifi_ssid'] = wifiid
+            config['wpa_key'] = wifipass
+    #write it back to the file
+    with open(Json, 'w') as f:
+            json.dump(config, f)
 #Fonction ecriture texte sur Nextion ex: ecrire(t0.txt,"hello word")
-def ecrire(champ,valeur):
-        eof = "\xff\xff\xff"
-        stringw = champ+'="'+valeur+'"' +eof
-        port.write(stringw)
+def ecrire(champ,texte):
+    wcmd = str.encode(champ)+b'="'+str.encode(texte)+b'"'+ eof
+    port.write(wcmd)
+
+    
 
 #Fonction appel de page
-def page(nompage):
-        eof = "\xff\xff\xff"
-        appelpage = 'page '+nompage +eof
-        port.write(appelpage)
-	print appelpage	
+ 
+def page(choixnompage):
+    appelpage = b'page ' + str.encode(choixnompage)+eof
+    port.write(appelpage)
+    infoserialpage="page " +choixnompage
+    print(appelpage) 
+
+
 
 #Fonction recherche de nom de ville selon code ICAO
 def getcity():
-	#lecture valeur icao dans config.json       
-    	with open(Json, 'r') as b:
-                afind= json.load(b)
-                airport =afind['airport_code']
-            
-    	#lecture ville dans fichier icao.cfg        
-    	icao2city = ConfigParser.RawConfigParser()
-    	config.read(icao)
-    	Result_city = config.get('icao2city', airport)
-    	#city= '"'+Result_city+'"'
-    	ecrire("meteo.t0.txt",Result_city) 
-    	print "Aeroport de: " +Result_city	
+    #lecture valeur icao dans config.json       
+    with open(Json, 'r') as b:
+            afind= json.load(b)
+            airport =afind['airport_code']
+        
+    #lecture ville dans fichier icao.cfg        
+    icao2city = configparser.RawConfigParser()
+    config.read(icao)
+    Result_city = config.get('icao2city', airport)
+    #city= '"'+Result_city+'"'
+    ecrire("meteo.t0.txt",Result_city) 
+    print("Aeroport de: " +Result_city) 
 
 #Fonction Meteo Lecture des donnees Metar + envoi Nextion
 def get_meteo():
-	#recherche code IMAO dans config.json
-	with open(Json, 'r') as b:
-                        afind= json.load(b)
-                        airport =afind['airport_code']
-	#Info ville Aéroport
-        print "Le code ICAO est: "+airport
+    #recherche code IMAO dans config.json
+    with open(Json, 'r') as b:
+        afind= json.load(b)
+        airport =afind['airport_code']
+    #Info ville Aéroport
+        print("Le code ICAO est: "+airport)
         getcity()
 
         fichier = open("/tmp/meteo.txt", "w")
@@ -262,9 +269,9 @@ def get_meteo():
         fichier.close()
 
         result = console('/opt/spotnik/spotnik2hmi/python-metar/get_report.py '+ airport+ '>> /tmp/meteo.txt')
-	print result
+        print(result)
         #routine ouverture fichier de config
-        config = ConfigParser.RawConfigParser()
+        config = configparser.RawConfigParser()
         config.read('/tmp/meteo.txt')
 
        #recuperation indicatif et frequence
@@ -276,7 +283,7 @@ def get_meteo():
         heure = buletin.split(':')
         heure = heure[0][-2:] + ":"+heure[1]+ ":"+heure[2][:2]
         print(heure)
-	print(pression[:-2])
+        print((pression[:-2]))
         print(rose)
         print(temperature)
         ecrire("meteo.t1.txt",str(temperature))
@@ -287,19 +294,19 @@ def get_meteo():
 
 def logo(Current_version):
 
-	print'                                                 \x1b[7;30;47m'"oo" +'\x1b[0m'                                                
-	print'\x1b[7;30;47m'+" `::::::::::::::::::::::::::::::::::::::::::::::oooo::::::::::::::::::::::::::::::::::::::::::::::`"+'\x1b[0m' 
-	print'\x1b[7;30;47m'+" .oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo."+'\x1b[0m' 
-	print'\x1b[7;30;43m'+" -:::::- ::::::.  -::::-` -:::::: -:::. .:: -:: ::-   .::`     ::::-.     -::`  ::- ::::`  .::: -::`"+'\x1b[0m'
-	print'\x1b[7;30;43m'+" //:---. ///.:// -//:-/// --://:- :////`:// /// ///  .//:      ---///-    ://.  //: ////- `//// ://."+'\x1b[0m'
-	print'\x1b[7;30;43m'+" //:--.` ///`-// ://. ///   -//`  :////::// /// ///-///.        .///.     ://---//: /////`-//// ://."+'\x1b[0m'
-	print'\x1b[7;30;43m'+" `.-:/// ///://: ://. ///   -//`  ://-///// /// ///-:///       -///:`     ://:--//: //::/://.// ://."+'\x1b[0m'
-	print'\x1b[7;30;43m'+" ...-/// ///     ://:.///   -//`  ://.-//// /// ///  `///      ////-..    ://.  //: //:`///:`// ://."+'\x1b[0m'
-	print'\x1b[7;30;43m'+" :::::-` ::-     `-::::-.   .::`  -::` -::: -:: ::-   ::-      :::::::    -::`  ::- ::- -::` :: -::`"+'\x1b[0m'
-	print'\x1b[7;30;47m'+" .oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo."+'\x1b[0m' 
-	print'\x1b[7;30;47m'+" `::::::::::::::::::::::::::::::::::::::::::::::oooo::::::::::::::::::::::::::::::::::::::::::::::`"+'\x1b[0m' 
-	print'                                                 \x1b[7;30;47m'"oo"+'\x1b[0m'                 
-	print'\x1b[7;30;47m'"                Version :" +Current_version+"                    "           '\x1b[0m'+'\x1b[7;30;47m' + "          TEAM:"+ '\x1b[0m' +'\x1b[3;37;44m' + "/F0DEI"+ '\x1b[0m' +'\x1b[6;30;47m' + "/F5SWB"+ '\x1b[0m' + '\x1b[6;37;41m' + "/F8ASB"+ '\x1b[0m'
-	print 
-	print  
+    print('                                                 \x1b[7;30;47m'"oo" +'\x1b[0m')                                                
+    print('\x1b[7;30;47m'+" `::::::::::::::::::::::::::::::::::::::::::::::oooo::::::::::::::::::::::::::::::::::::::::::::::`"+'\x1b[0m') 
+    print('\x1b[7;30;47m'+" .oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo."+'\x1b[0m') 
+    print('\x1b[7;30;43m'+" -:::::- ::::::.  -::::-` -:::::: -:::. .:: -:: ::-   .::`     ::::-.     -::`  ::- ::::`  .::: -::`"+'\x1b[0m')
+    print('\x1b[7;30;43m'+" //:---. ///.:// -//:-/// --://:- :////`:// /// ///  .//:      ---///-    ://.  //: ////- `//// ://."+'\x1b[0m')
+    print('\x1b[7;30;43m'+" //:--.` ///`-// ://. ///   -//`  :////::// /// ///-///.        .///.     ://---//: /////`-//// ://."+'\x1b[0m')
+    print('\x1b[7;30;43m'+" `.-:/// ///://: ://. ///   -//`  ://-///// /// ///-:///       -///:`     ://:--//: //::/://.// ://."+'\x1b[0m')
+    print('\x1b[7;30;43m'+" ...-/// ///     ://:.///   -//`  ://.-//// /// ///  `///      ////-..    ://.  //: //:`///:`// ://."+'\x1b[0m')
+    print('\x1b[7;30;43m'+" :::::-` ::-     `-::::-.   .::`  -::` -::: -:: ::-   ::-      :::::::    -::`  ::- ::- -::` :: -::`"+'\x1b[0m')
+    print('\x1b[7;30;47m'+" .oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo."+'\x1b[0m') 
+    print('\x1b[7;30;47m'+" `::::::::::::::::::::::::::::::::::::::::::::::oooo::::::::::::::::::::::::::::::::::::::::::::::`"+'\x1b[0m') 
+    print('                                                 \x1b[7;30;47m'"oo"+'\x1b[0m')                 
+    print('\x1b[7;30;47m'"                Version :" +Current_version+"                    "           '\x1b[0m'+'\x1b[7;30;47m' + "          TEAM:"+ '\x1b[0m' +'\x1b[3;37;44m' + "/F0DEI"+ '\x1b[0m' +'\x1b[6;30;47m' + "/F5SWB"+ '\x1b[0m' + '\x1b[6;37;41m' + "/F8ASB"+ '\x1b[0m')
+    print() 
+    print()  
 
