@@ -160,7 +160,7 @@ def usage():
 #Fonction envoyer un code DTMF au system
 def dtmf(code):
     
-    b = open("/tmp/dtmf_uhf","a")
+    b = open("/tmp/dtmf_vhf","w")
     b.write(code)
     print("code DTMF: "+code)
     b.close()
