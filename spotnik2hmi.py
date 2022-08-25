@@ -178,7 +178,7 @@ while 1:
     if tn.find("rrf") == -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
-        ecrire("trafic.t0.txt","SALON RRF")
+        ecrire("trafic.t0.txt","RESEAU RRF")
         url = url1
         
     if tn.find("fon") == -1:
