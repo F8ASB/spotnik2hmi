@@ -92,13 +92,13 @@ Vérifier dans le fichier /etc/rc.local (fichier de démarrage) que le lancemen
 Lancer le script à la main pour voir si la communication est opérationnelle.
 
 ```
-sudo python /opt/spotnik/spotnik2hmi/spotnik2hmi.py (choix du com) (vitesse)
+sudo python3 /opt/spotnik/spotnik2hmi/spotnik2hmi.py (choix du com) (vitesse)
 ```
 #### Comment vérifier quelle est l'erreur qui entraine l'arrêt du script spotnik2hmi?
 Il faut lancer le script en manuel en ssh depuis une console.
 Taper la commande 
 ```
-sudo python /opt/spotnik/spotnik2hmi/spotnik2hmi.py (choix du com) (vitesse)
+sudo python3 /opt/spotnik/spotnik2hmi/spotnik2hmi.py (choix du com) (vitesse)
 ```
 Vous aurez toutes les commandes en monitoring.
 
