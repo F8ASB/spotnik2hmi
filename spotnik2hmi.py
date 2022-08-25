@@ -265,7 +265,7 @@ while 1:
             #setdim(rdim)
 
     if tn.find("tec") != -1:
-        fincall= page_web.find ('"transmitter":"')  
+        fincall= page_web.find  ('"TXmit":"')  
         dashdebut= page_web.find ('"nodes":[')
         dashfin= page_web.find ('],"transmit":')
         
@@ -284,13 +284,13 @@ while 1:
             #dimsend ='dim='+str(rdim)+eof
             #setdim(rdim)
     if tn.find("int") != -1:
-        fincall= page_web.find ('"transmitter":"')  
+        fincall= page_web.find  ('"TXmit":"')  
         dashdebut= page_web.find ('"nodes":[')
         dashfin= page_web.find ('],"transmit":')
         
         if fincall >0:
             tramecall= (page_web[(fincall):fincall+30])
-            tramedash= (page_web[(dashdebut+10):(dashfin)])
+         #   tramedash= (page_web[(dashdebut+10):(dashfin)])
             call = tramecall.split('"')
             print(call[3])
             dashlist= tramedash.replace('"','')
@@ -303,7 +303,7 @@ while 1:
             #setdim(rdim)
     
     if tn.find("bav") != -1:
-        fincall= page_web.find ('"transmitter":"')  
+        fincall= page_web.find  ('"TXmit":"')   
         dashdebut= page_web.find ('"nodes":[')
         dashfin= page_web.find ('],"transmit":')
         
@@ -322,7 +322,7 @@ while 1:
             #setdim(rdim)
 
     if tn.find("loc") != -1:
-        fincall= page_web.find ('"transmitter":"')  
+        fincall= page_web.find  ('"TXmit":"')   
         dashdebut= page_web.find ('"nodes":[')
         dashfin= page_web.find ('],"transmit":')
         
@@ -341,7 +341,7 @@ while 1:
             #setdim(rdim)        
 
     if tn.find("fon") != -1:
-        fincall= page_web.find ('"transmitter":"')
+        fincall= page_web.find  ('"TXmit":"') 
       
         if fincall >0:
             tramecall= (page_web[(fincall):fincall+30])
@@ -357,7 +357,7 @@ while 1:
             #setdim(rdim)
     ecrire("trafic.t1.txt",TxStation)
     if tn.find("exp") != -1:
-        fincall= page_web.find ('"transmitter":"')
+        fincall= page_web.find  ('"TXmit":"') 
       
         if fincall >0:
             tramecall= (page_web[(fincall):fincall+30])
