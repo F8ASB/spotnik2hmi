@@ -164,6 +164,12 @@ def dtmf(code):
     b.write(code)
     print("code DTMF: "+code)
     b.close()
+    
+    b = open("/tmp/dtmf_uhf","w")
+    b.write(code)
+    print("code DTMF: "+code)
+    b.close()
+
 
 #Fonction envoyer le prenom selon le call
 def prenom(Searchcall):
