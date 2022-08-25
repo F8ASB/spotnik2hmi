@@ -215,13 +215,13 @@ while 1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
         ecrire("trafic.t0.txt","SALON EXPER.")    
-    url = url7    
+        url = url7    
 
     if tn.find("reg") == -1:
         ecrire("page200.t3.txt","Mode autonome")
     else:
         ecrire("trafic.t0.txt","SALON REG.")    
-    url = url8    
+        url = url8    
 
     if tn.find("default") == -1:
         ecrire("page200.t3.txt","Mode autonome")
@@ -265,7 +265,7 @@ while 1:
             #setdim(rdim)
 
     if tn.find("tec") != -1:
-        fincall= page_web.find  ('"TXmit":"')  
+        fincall= page_web.find  ('"transmitter":')  
         dashdebut= page_web.find ('"nodes":[')
         dashfin= page_web.find ('],"transmit":')
         
@@ -284,7 +284,7 @@ while 1:
             #dimsend ='dim='+str(rdim)+eof
             #setdim(rdim)
     if tn.find("int") != -1:
-        fincall= page_web.find  ('"TXmit":"')  
+        fincall= page_web.find  ('"transmitter":')  
         dashdebut= page_web.find ('"nodes":[')
         dashfin= page_web.find ('],"transmit":')
         
@@ -303,7 +303,7 @@ while 1:
             #setdim(rdim)
     
     if tn.find("bav") != -1:
-        fincall= page_web.find  ('"TXmit":"')   
+        fincall= page_web.find  ('"transmitter":')   
         dashdebut= page_web.find ('"nodes":[')
         dashfin= page_web.find ('],"transmit":')
         
@@ -322,7 +322,7 @@ while 1:
             #setdim(rdim)
 
     if tn.find("loc") != -1:
-        fincall= page_web.find  ('"TXmit":"')   
+        fincall= page_web.find  ('"transmitter":')   
         dashdebut= page_web.find ('"nodes":[')
         dashfin= page_web.find ('],"transmit":')
         
@@ -341,7 +341,7 @@ while 1:
             #setdim(rdim)        
 
     if tn.find("fon") != -1:
-        fincall= page_web.find  ('"TXmit":"') 
+        fincall= page_web.find  ('"transmitter":') 
       
         if fincall >0:
             tramecall= (page_web[(fincall):fincall+30])
@@ -357,7 +357,7 @@ while 1:
             #setdim(rdim)
     ecrire("trafic.t1.txt",TxStation)
     if tn.find("exp") != -1:
-        fincall= page_web.find  ('"TXmit":"') 
+        fincall= page_web.find  ('"transmitter":') 
       
         if fincall >0:
             tramecall= (page_web[(fincall):fincall+30])
