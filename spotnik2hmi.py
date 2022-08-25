@@ -265,7 +265,7 @@ while 1:
             #setdim(rdim)
 
     if tn.find("tec") != -1:
-        fincall= page_web.find ('"transmitter":"')  
+        fincall= page_web.find ('"TXmit":"')  
         dashdebut= page_web.find ('"nodes":[')
         dashfin= page_web.find ('],"transmit":')
         
